@@ -10,6 +10,9 @@ there while the remaining letters continue animating. Letter
 opacity changes randomly between `0` and `1` and returns to `1` when a letter
 resolves. The original text is restored in randomized groups, not from left to
 right. Spaces, punctuation, and non-Latin characters are left unchanged.
+Changed letters use a brief blur-and-movement CSS transition; `fadeDuration`
+controls the transition timing. The character transition is skipped when the
+user prefers reduced motion.
 
 ## Install
 
@@ -91,6 +94,6 @@ label.
 | `stagger` | `500` | Delay in milliseconds between group starts. |
 | `steps` | `3` | Number of random-letter states (including the initial scramble) before each letter returns to its original value. |
 | `stepInterval` | `60` | Delay in milliseconds between random-letter states and before each letter returns to its original value. |
-| `fadeDuration` | `180` | CSS opacity transition duration in milliseconds. Opacity is randomized automatically during animation and returns to `1` when each letter resolves. |
+| `fadeDuration` | `180` | CSS opacity, blur, and movement transition duration in milliseconds. Opacity is randomized automatically during animation and returns to `1` when each letter resolves. |
 | `effect` | `spark` | Randomized opacity changes while letters animate. This is the only supported effect. |
 | `alphabet` | `ABCDEFGHIJKLMNOPQRSTUVWXYZ` | Characters used as random replacements. Character case follows the original letter. |

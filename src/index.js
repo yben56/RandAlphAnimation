@@ -1,4 +1,5 @@
 import { runTextAnimation } from './core.js';
+import { transitionCharacter } from './character-transition.js';
 
 /**
  * Animate the Latin letters in an element's text, then restore the original text.
@@ -25,7 +26,10 @@ export function animateText(element, options = {}) {
     currentOpacities = opacities;
     if (characterElements.length === Array.from(text).length && characterElements.length > 0) {
       Array.from(text).forEach((character, index) => {
-        characterElements[index].textContent = character;
+        if (characterElements[index].textContent !== character) {
+          characterElements[index].textContent = character;
+          transitionCharacter(characterElements[index]);
+        }
         characterElements[index].style.opacity = String(opacities[index]);
       });
       return;
@@ -45,7 +49,9 @@ export function animateText(element, options = {}) {
       characterElements = Array.from(originalText, () => {
         const characterElement = document.createElement('span');
         characterElement.style.transition =
-          `opacity ${Number(options.fadeDuration ?? 180)}ms ease`;
+          `opacity ${Number(options.fadeDuration ?? 180)}ms ease, ` +
+          `filter ${Number(options.fadeDuration ?? 180)}ms ease, ` +
+          `transform ${Number(options.fadeDuration ?? 180)}ms ease`;
         return characterElement;
       });
       element.replaceChildren(...characterElements);

@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { animateText } from '../src/index.js';
 import { runTextAnimation } from '../src/core.js';
+import { transitionCharacter } from '../src/character-transition.js';
 
 function useFakeTimers(callback, randomValues = [0]) {
   const originalSetTimeout = globalThis.setTimeout;
@@ -149,6 +150,29 @@ test('rejects unsupported effects', () => {
     () => runTextAnimation('A', { effect: 'flip' }, () => {}),
     /effect option must be "spark"/,
   );
+});
+
+test('transitions changed characters with blur and movement, respecting reduced motion', () => {
+  const element = {
+    style: {},
+    ownerDocument: { defaultView: { matchMedia: () => ({ matches: false }) } },
+    get offsetWidth() {
+      this.layoutRead = true;
+      return 10;
+    },
+  };
+  transitionCharacter(element);
+
+  assert.equal(element.layoutRead, true);
+  assert.equal(element.style.filter, 'blur(0)');
+  assert.equal(element.style.transform, 'translateY(0) scale(1)');
+
+  const reducedMotionElement = {
+    style: {},
+    ownerDocument: { defaultView: { matchMedia: () => ({ matches: true }) } },
+  };
+  transitionCharacter(reducedMotionElement);
+  assert.deepEqual(reducedMotionElement.style, {});
 });
 
 test('DOM API restores the original text on stop and prevents restart after destroy', () => {

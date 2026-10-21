@@ -1,5 +1,6 @@
-import { defineComponent, h, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { defineComponent, h, onBeforeUnmount, onMounted, onUpdated, ref, watch } from 'vue';
 import { DEFAULT_OPTIONS, runTextAnimation } from './core.js';
+import { transitionCharacter } from './character-transition.js';
 
 export const RandomText = defineComponent({
   name: 'RandomText',
@@ -17,6 +18,8 @@ export const RandomText = defineComponent({
   setup(props, { attrs }) {
     const displayedCharacters = ref(Array.from(props.text));
     const displayedOpacities = ref(Array.from(props.text, () => 1));
+    const characterElements = [];
+    let previousCharacters = [...displayedCharacters.value];
     let animation;
     let mounted = false;
 
@@ -24,6 +27,7 @@ export const RandomText = defineComponent({
       animation?.stop();
       displayedCharacters.value = Array.from(props.text);
       displayedOpacities.value = Array.from(props.text, () => 1);
+      previousCharacters = [...displayedCharacters.value];
       animation = runTextAnimation(
         props.text,
         {
@@ -45,6 +49,15 @@ export const RandomText = defineComponent({
     onMounted(() => {
       mounted = true;
       restart();
+    });
+
+    onUpdated(() => {
+      displayedCharacters.value.forEach((character, index) => {
+        if (character !== previousCharacters[index] && characterElements[index]) {
+          transitionCharacter(characterElements[index]);
+        }
+      });
+      previousCharacters = [...displayedCharacters.value];
     });
 
     watch(
@@ -81,9 +94,14 @@ export const RandomText = defineComponent({
                 'span',
                 {
                   key: index,
+                  ref: (element) => {
+                    characterElements[index] = element;
+                  },
                   style: {
                     opacity: displayedOpacities.value[index] ?? 1,
-                    transition: `opacity ${props.fadeDuration}ms ease`,
+                    transition: `opacity ${props.fadeDuration}ms ease, ` +
+                      `filter ${props.fadeDuration}ms ease, ` +
+                      `transform ${props.fadeDuration}ms ease`,
                   },
                 },
                 character,
