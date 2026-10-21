@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { animateText } from '../src/index.js';
-import { createFlipState, runTextAnimation, updateFlipRoller } from '../src/core.js';
+import { runTextAnimation } from '../src/core.js';
 
 function useFakeTimers(callback, randomValues = [0]) {
   const originalSetTimeout = globalThis.setTimeout;
@@ -140,44 +140,15 @@ test('uses randomized opacity while letters animate and restores full opacity', 
   );
 });
 
-test('flip effect keeps characters opaque and rejects unknown effects', () => {
-  useFakeTimers(({ advance }) => {
-    const updates = [];
-    runTextAnimation(
-      'A',
-      { groups: 1, steps: 2, stepInterval: 10, effect: 'flip' },
-      (text, opacities) => updates.push({ text, opacity: opacities[0] }),
-    );
-
-    assert.equal(updates[0].opacity, 1);
-    advance(10);
-    assert.equal(updates.at(-1).opacity, 1);
-  });
-
+test('rejects unsupported effects', () => {
   assert.throws(
     () => runTextAnimation('A', { effect: 'unknown' }, () => {}),
-    /effect option must be "spark" or "flip"/,
+    /effect option must be "spark"/,
   );
-});
-
-test('flip roller scrolls the character reel vertically to the next glyph', () => {
-  const state = createFlipState('A', 'ABC');
-  const track = { style: {}, offsetHeight: 0 };
-  updateFlipRoller(track, state, 'C', 400);
-
-  assert.equal(state.character, 'C');
-  assert.equal(track.style.transform, `translateY(-${state.position}em)`);
-  assert.match(track.style.transition, /^transform 400ms/);
-});
-
-test('flip roller leaves spaces and punctuation static', () => {
-  assert.deepEqual(createFlipState(' '), {
-    characters: [' '],
-    index: 0,
-    position: 2,
-    character: ' ',
-  });
-  assert.deepEqual(createFlipState('!').characters, ['!']);
+  assert.throws(
+    () => runTextAnimation('A', { effect: 'flip' }, () => {}),
+    /effect option must be "spark"/,
+  );
 });
 
 test('DOM API restores the original text on stop and prevents restart after destroy', () => {

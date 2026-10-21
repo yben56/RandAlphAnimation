@@ -137,13 +137,6 @@
           變換間隔 stepInterval (ms)
           <input id="plain-step-interval" type="number" min="0" value="100" />
         </label>
-        <label>
-          動畫效果
-          <select id="plain-effect">
-            <option value="spark">spark</option>
-            <option value="flip">Rotary Counter</option>
-          </select>
-        </label>
       </div>
       <button id="plain-play" type="button">播放</button>
       <button id="plain-stop" type="button">停止</button>
@@ -170,12 +163,10 @@
           stagger: Number(document.querySelector('#plain-stagger').value),
           steps: Number(document.querySelector('#plain-steps').value),
           stepInterval: Number(document.querySelector('#plain-step-interval').value),
-          effect: document.querySelector('#plain-effect').value,
         });
       };
 
       document.querySelector('#plain-play').addEventListener('click', playPlainText);
-      document.querySelector('#plain-effect').addEventListener('change', playPlainText);
       document.querySelector('#plain-stop').addEventListener('click', () => {
         plainAnimation?.stop();
       });
@@ -188,7 +179,6 @@
           const stagger = ref(100);
           const steps = ref(8);
           const stepInterval = ref(100);
-          const effect = ref('spark');
           const replayKey = ref(0);
 
           return {
@@ -197,7 +187,6 @@
             stagger,
             steps,
             stepInterval,
-            effect,
             replayKey,
             replay: () => {
               replayKey.value += 1;
@@ -214,7 +203,6 @@
               :stagger="stagger"
               :steps="steps"
               :step-interval="stepInterval"
-              :effect="effect"
             />
             <div class="controls">
               <label>
@@ -236,13 +224,6 @@
               <label>
                 變換間隔 stepInterval (ms)
                 <input v-model.number="stepInterval" type="number" min="0" />
-              </label>
-              <label>
-                動畫效果
-                <select v-model="effect">
-                  <option value="spark">spark</option>
-                  <option value="flip">Rotary Counter</option>
-                </select>
               </label>
             </div>
             <button type="button" @click="replay">重新播放</button>

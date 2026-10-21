@@ -6,63 +6,9 @@ export const DEFAULT_OPTIONS = {
   steps: 3,
   stepInterval: 60,
   fadeDuration: 180,
-  flipDuration: 500,
   effect: 'spark',
   alphabet: DEFAULT_ALPHABET,
 };
-
-export function createFlipState(character, alphabet = DEFAULT_ALPHABET) {
-  if (!/^[a-z]$/i.test(character)) {
-    return {
-      characters: [character],
-      index: 0,
-      position: 2,
-      character,
-    };
-  }
-
-  const lowercase = character !== character.toUpperCase();
-  const characters = Array.from(new Set([
-    ...Array.from(alphabet, (letter) => lowercase ? letter.toLowerCase() : letter.toUpperCase()),
-    character,
-  ]));
-  const characterIndex = characters.indexOf(character);
-
-  return {
-    characters,
-    index: characterIndex,
-    position: characters.length * 2 + characterIndex,
-    character,
-  };
-}
-
-export function updateFlipRoller(track, state, character, duration) {
-  if (character === state.character) return;
-
-  const targetIndex = state.characters.indexOf(character);
-  if (targetIndex === -1) return;
-
-  const currentIndex = ((state.position % state.characters.length) + state.characters.length)
-    % state.characters.length;
-  const forward = (targetIndex - currentIndex + state.characters.length) % state.characters.length;
-  const backward = forward - state.characters.length;
-  const delta = Math.abs(forward) <= Math.abs(backward) ? forward : backward;
-  state.position += delta;
-  state.character = character;
-
-  if (
-    state.position < state.characters.length ||
-    state.position >= state.characters.length * 4
-  ) {
-    state.position = state.characters.length * 2 + targetIndex;
-    track.style.transition = 'none';
-    track.style.transform = `translateY(-${state.position}em)`;
-    track.offsetHeight;
-  }
-
-  track.style.transition = `transform ${duration}ms cubic-bezier(0.2, 0.7, 0.3, 1)`;
-  track.style.transform = `translateY(-${state.position}em)`;
-}
 
 function normalizeOptions(options = {}) {
   const groups = Math.max(1, Math.floor(Number(options.groups ?? DEFAULT_OPTIONS.groups)));
@@ -70,16 +16,15 @@ function normalizeOptions(options = {}) {
   const steps = Math.max(0, Math.floor(Number(options.steps ?? DEFAULT_OPTIONS.steps)));
   const stepInterval = Math.max(0, Number(options.stepInterval ?? DEFAULT_OPTIONS.stepInterval));
   const fadeDuration = Math.max(0, Number(options.fadeDuration ?? DEFAULT_OPTIONS.fadeDuration));
-  const flipDuration = Math.max(0, Number(options.flipDuration ?? DEFAULT_OPTIONS.flipDuration));
   const effect = options.effect ?? DEFAULT_OPTIONS.effect;
   const alphabet = Array.from(options.alphabet ?? DEFAULT_OPTIONS.alphabet);
 
-  if (![groups, stagger, steps, stepInterval, fadeDuration, flipDuration]
+  if (![groups, stagger, steps, stepInterval, fadeDuration]
     .every(Number.isFinite)) {
     throw new TypeError('Animation timing options must be finite numbers.');
   }
-  if (!['spark', 'flip'].includes(effect)) {
-    throw new TypeError('The effect option must be "spark" or "flip".');
+  if (effect !== 'spark') {
+    throw new TypeError('The effect option must be "spark".');
   }
   if (alphabet.length === 0) {
     throw new TypeError('The alphabet option must contain at least one character.');
@@ -91,7 +36,6 @@ function normalizeOptions(options = {}) {
     steps,
     stepInterval,
     fadeDuration,
-    flipDuration,
     effect,
     alphabet,
   };
@@ -158,8 +102,7 @@ export function runTextAnimation(text, options, onUpdate) {
       if (scrambleCandidates.length > 0) {
         characters[characterIndex] =
           scrambleCandidates[Math.floor(Math.random() * scrambleCandidates.length)];
-        opacities[characterIndex] =
-          settings.effect === 'spark' && Math.random() < 0.5 ? 0 : 1;
+        opacities[characterIndex] = Math.random() < 0.5 ? 0 : 1;
       }
     }
     publish();
@@ -181,8 +124,7 @@ export function runTextAnimation(text, options, onUpdate) {
               publish();
               return;
             }
-            opacities[characterIndex] =
-              settings.effect === 'spark' && Math.random() < 0.5 ? 0 : 1;
+            opacities[characterIndex] = Math.random() < 0.5 ? 0 : 1;
           }
           publish();
         }, elapsed);

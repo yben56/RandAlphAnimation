@@ -11,8 +11,7 @@ opacity changes randomly between `0` and `1` and returns to `1` when a letter
 resolves. The original text is restored in randomized groups, not from left to
 right. Spaces, punctuation, and non-Latin characters are left unchanged.
 
-Choose the `spark` effect (the default) for randomized opacity changes, or the
-`flip` effect for a mechanical-style vertical character reel (Rotary Counter).
+The animation uses randomized opacity changes as letters change.
 
 ## Install
 
@@ -44,7 +43,6 @@ const animation = animateText(title, {
   stagger: 500,
   steps: 3,
   stepInterval: 60,
-  effect: 'flip',
 });
 
 // When needed, stop and restore, replay, or permanently clean up:
@@ -77,7 +75,6 @@ import { RandomText } from 'rand-alph-animation/vue';
     :stagger="500"
     :steps="3"
     :step-interval="60"
-    effect="flip"
   />
 </template>
 ```
@@ -97,6 +94,4 @@ label.
 | `steps` | `3` | Number of random-letter states (including the initial scramble) before each letter returns to its original value. |
 | `stepInterval` | `60` | Delay in milliseconds between random-letter states and before each letter returns to its original value. |
 | `fadeDuration` | `180` | CSS opacity transition duration in milliseconds. Opacity is randomized automatically during animation and returns to `1` when each letter resolves. |
-| `effect` | `spark` | Character transition style: `spark` for randomized opacity changes or `flip` for the vertically rolling Rotary Counter. |
-| `flipDuration` | `500` | Duration in milliseconds of each character reel movement. |
 | `alphabet` | `ABCDEFGHIJKLMNOPQRSTUVWXYZ` | Characters used as random replacements. Character case follows the original letter. |
