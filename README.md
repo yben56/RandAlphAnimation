@@ -6,12 +6,10 @@ At the start, all Latin letters change to random letters at once. The letters
 are then randomly shuffled into balanced groups; each group continues changing
 for the configured number of steps and resolves back to the original text after
 its delay. If a letter randomly reaches its original value early, it stays
-there while the remaining letters continue animating. In `spark` mode, letter
+there while the remaining letters continue animating. Letter
 opacity changes randomly between `0` and `1` and returns to `1` when a letter
 resolves. The original text is restored in randomized groups, not from left to
 right. Spaces, punctuation, and non-Latin characters are left unchanged.
-
-The animation uses randomized opacity changes as letters change.
 
 ## Install
 
@@ -94,4 +92,5 @@ label.
 | `steps` | `3` | Number of random-letter states (including the initial scramble) before each letter returns to its original value. |
 | `stepInterval` | `60` | Delay in milliseconds between random-letter states and before each letter returns to its original value. |
 | `fadeDuration` | `180` | CSS opacity transition duration in milliseconds. Opacity is randomized automatically during animation and returns to `1` when each letter resolves. |
+| `effect` | `spark` | Randomized opacity changes while letters animate. This is the only supported effect. |
 | `alphabet` | `ABCDEFGHIJKLMNOPQRSTUVWXYZ` | Characters used as random replacements. Character case follows the original letter. |

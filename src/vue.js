@@ -1,4 +1,4 @@
-import { defineComponent, h, onBeforeUnmount, onMounted, onUpdated, ref, watch } from 'vue';
+import { defineComponent, h, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { DEFAULT_OPTIONS, runTextAnimation } from './core.js';
 
 export const RandomText = defineComponent({
@@ -75,7 +75,7 @@ export const RandomText = defineComponent({
         [
           h(
             'span',
-            { 'aria-hidden': 'true'             },
+            { 'aria-hidden': 'true' },
             displayedCharacters.value.map((character, index) =>
               h(
                 'span',
