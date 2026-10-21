@@ -1,0 +1,27 @@
+{
+  "name": "rand-alph-animation",
+  "version": "1.0.0",
+  "description": "A lightweight randomized letter animation for JavaScript and Vue 3.",
+  "type": "module",
+  "main": "./src/index.js",
+  "module": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./vue": "./src/vue.js"
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "peerDependencies": {
+    "vue": "^3.2.0"
+  },
+  "peerDependenciesMeta": {
+    "vue": {
+      "optional": true
+    }
+  }
+}

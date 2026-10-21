@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rand Alph Animation Demo</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: system-ui, sans-serif;
+        color: #182230;
+        background: #f4f7fb;
+      }
+
+      body {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 32px 20px 60px;
+      }
+
+      h1,
+      h2 {
+        margin-top: 0;
+      }
+
+      section {
+        margin: 24px 0;
+        padding: 24px;
+        border: 1px solid #d9e1ec;
+        border-radius: 12px;
+        background: white;
+      }
+
+      .display {
+        min-height: 1.5em;
+        margin: 24px 0;
+        font-size: clamp(2rem, 8vw, 4rem);
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        overflow-wrap: anywhere;
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        font-size: 0.9rem;
+      }
+
+      input {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 9px;
+        border: 1px solid #aebbd0;
+        border-radius: 6px;
+        font: inherit;
+      }
+
+      select {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 9px;
+        border: 1px solid #aebbd0;
+        border-radius: 6px;
+        font: inherit;
+      }
+
+      button {
+        margin-top: 16px;
+        padding: 10px 16px;
+        border: 0;
+        border-radius: 6px;
+        color: white;
+        background: #2457c5;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      button + button {
+        margin-left: 8px;
+        color: #182230;
+        background: #e6ebf3;
+      }
+
+      .hint {
+        color: #526174;
+        font-size: 0.9rem;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .display {
+          letter-spacing: normal;
+        }
+      }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Rand Alph Animation 測試頁</h1>
+    <p class="hint">
+      調整參數後按「播放」。一般 JS 與 Vue 範例使用各自獨立的設定。
+      Vue 範例需要網路載入 Vue 3。
+    </p>
+
+    <section>
+      <h2>一般 JavaScript</h2>
+      <div id="plain-text" class="display">Hello World</div>
+      <div class="controls">
+        <label>
+          文字
+          <input id="plain-input-text" value="Hello World" />
+        </label>
+        <label>
+          分組數 groups
+          <input id="plain-groups" type="number" min="1" value="3" />
+        </label>
+        <label>
+          批次間隔 stagger (ms)
+          <input id="plain-stagger" type="number" min="0" value="100" />
+        </label>
+        <label>
+          亂數字母狀態數 steps
+          <input id="plain-steps" type="number" min="0" value="8" />
+        </label>
+        <label>
+          變換間隔 stepInterval (ms)
+          <input id="plain-step-interval" type="number" min="0" value="100" />
+        </label>
+        <label>
+          動畫效果
+          <select id="plain-effect">
+            <option value="spark">spark</option>
+            <option value="flip">Rotary Counter</option>
+          </select>
+        </label>
+      </div>
+      <button id="plain-play" type="button">播放</button>
+      <button id="plain-stop" type="button">停止</button>
+    </section>
+
+    <section>
+      <h2>Vue 3 元件</h2>
+      <div id="vue-demo"></div>
+    </section>
+
+    <script type="module">
+      import { animateText } from './src/index.js';
+      import { createApp, defineComponent, ref } from 'vue';
+      import { RandomText } from './src/vue.js';
+
+      const textElement = document.querySelector('#plain-text');
+      let plainAnimation;
+
+      const playPlainText = () => {
+        plainAnimation?.destroy();
+        textElement.textContent = document.querySelector('#plain-input-text').value;
+        plainAnimation = animateText(textElement, {
+          groups: Number(document.querySelector('#plain-groups').value),
+          stagger: Number(document.querySelector('#plain-stagger').value),
+          steps: Number(document.querySelector('#plain-steps').value),
+          stepInterval: Number(document.querySelector('#plain-step-interval').value),
+          effect: document.querySelector('#plain-effect').value,
+        });
+      };
+
+      document.querySelector('#plain-play').addEventListener('click', playPlainText);
+      document.querySelector('#plain-effect').addEventListener('change', playPlainText);
+      document.querySelector('#plain-stop').addEventListener('click', () => {
+        plainAnimation?.stop();
+      });
+
+      const VueDemo = defineComponent({
+        components: { RandomText },
+        setup() {
+          const text = ref('Hello World');
+          const groups = ref(3);
+          const stagger = ref(100);
+          const steps = ref(8);
+          const stepInterval = ref(100);
+          const effect = ref('spark');
+          const replayKey = ref(0);
+
+          return {
+            text,
+            groups,
+            stagger,
+            steps,
+            stepInterval,
+            effect,
+            replayKey,
+            replay: () => {
+              replayKey.value += 1;
+            },
+          };
+        },
+        template: `
+          <div>
+            <RandomText
+              :key="replayKey"
+              class="display"
+              :text="text"
+              :groups="groups"
+              :stagger="stagger"
+              :steps="steps"
+              :step-interval="stepInterval"
+              :effect="effect"
+            />
+            <div class="controls">
+              <label>
+                文字
+                <input v-model="text" />
+              </label>
+              <label>
+                分組數 groups
+                <input v-model.number="groups" type="number" min="1" />
+              </label>
+              <label>
+                批次間隔 stagger (ms)
+                <input v-model.number="stagger" type="number" min="0" />
+              </label>
+              <label>
+                亂數字母狀態數 steps
+                <input v-model.number="steps" type="number" min="0" />
+              </label>
+              <label>
+                變換間隔 stepInterval (ms)
+                <input v-model.number="stepInterval" type="number" min="0" />
+              </label>
+              <label>
+                動畫效果
+                <select v-model="effect">
+                  <option value="spark">spark</option>
+                  <option value="flip">Rotary Counter</option>
+                </select>
+              </label>
+            </div>
+            <button type="button" @click="replay">重新播放</button>
+          </div>
+        `,
+      });
+
+      createApp(VueDemo).mount('#vue-demo');
+    </script>
+  </body>
+</html>
